@@ -1,8 +1,3 @@
-# kmercpp
-
-A 2bit representation of a k-mer using c++17 with a runtime implementation selector mechanism.
-
-```cpp
 #include <iostream>
 #include <kmercpp/kmer.hpp>
 #include <kmercpp/kmer_hash.hpp>
@@ -39,17 +34,3 @@ int main(int argc, char* argv[])
   kmercpp::const_loop_executor<0, KMER_N>::exec<EntryPoint>(ksize, ksize, seq);
   return 0;
 }
-```
-
-```bash
-> g++ -std=c++17 -I./ main.cpp -o main
-> main 30
-Use K=30 with Kmer<32> - uint64_t implementation.
-> main 50
-Use K=50 with Kmer<64> - __uint128_t implementation.
-> main 90
-Use K=90 with Kmer<92> - uint64_t[3] implementation.
-> main 115
-Use K=115 with Kmer<128> - uint64_t[4] implementation.
-> main 130 # throw, needs to increase KMER_LIST -> #define KMER_LIST 32, 64, 96, 128, 172 and #define KMER_N 5
-```

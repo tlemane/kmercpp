@@ -12,31 +12,24 @@ A 2bit representation of a k-mer using c++17 with a runtime implementation selec
 
 #include <kmercpp/loop_executor.hpp>
 
-// program entry point, hash all k-mer from a string
 template<size_t KSIZE>
 struct EntryPoint
 {
   using Type = kmercpp::Kmer<KSIZE>;
-  using FollyHash = kmercpp::KmerHashers<0>::Hasher<KSIZE>;
-  void operator()(size_t kmer_size, const std::string& seq)
+  void operator()(size_t kmer_size, int argc, char* argv[]) // use this as main
   {
-    FollyHash hasher;
     std::cerr << "Use K=" << kmer_size;
     std::cerr << " with " <<  Type::name() << " implementation." << std::endl;
-
-    if (seq.size() < kmer_size)
-      exit(EXIT_FAILURE);
   }
 };
 
 int main(int argc, char* argv[])
 {
   std::string kmer_size(argv[1]);
-  std::string seq = "";
   size_t ksize = std::stoll(kmer_size);
 
   // The first param ksize is for the selector, others are EntryPoint::operator() parameters.
-  kmercpp::const_loop_executor<0, KMER_N>::exec<EntryPoint>(ksize, ksize, seq);
+  kmercpp::const_loop_executor<0, KMER_N>::exec<EntryPoint>(ksize, ksize, argc, argv);
   return 0;
 }
 ```

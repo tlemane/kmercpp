@@ -2,7 +2,7 @@
 #include <kmercpp/kmer.hpp>
 #include <kmercpp/kmer_hash.hpp>
 
-#define KMER_LIST 32, 64, 92, 128
+#define KMER_LIST 32, 64, 96, 128
 #define KMER_N 4
 
 #include <kmercpp/loop_executor.hpp>

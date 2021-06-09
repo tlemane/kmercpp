@@ -6,11 +6,9 @@ A 2bit representation of a k-mer using c++17 with a runtime implementation selec
 #include <iostream>
 #include <kmercpp/kmer.hpp>
 #include <kmercpp/kmer_hash.hpp>
-
-#define KMER_LIST 32, 64, 96, 128
-#define KMER_N 4
-
 #include <kmercpp/loop_executor.hpp>
+
+#define MAX_KMER_SIZE 512
 
 template<size_t KSIZE>
 struct EntryPoint
@@ -29,7 +27,7 @@ int main(int argc, char* argv[])
   size_t ksize = std::stoll(kmer_size);
 
   // The first param ksize is for the selector, others are EntryPoint::operator() parameters.
-  kmercpp::const_loop_executor<0, KMER_N>::exec<EntryPoint>(ksize, ksize, argc, argv);
+  kmercpp::const_loop_executor<MAX_KMER_SIZE>::exec<EntryPoint>(ksize, ksize, argc, argv);
   return 0;
 }
 ```
@@ -44,5 +42,5 @@ Use K=50 with Kmer<64> - __uint128_t implementation.
 Use K=90 with Kmer<96> - uint64_t[3] implementation.
 > main 115
 Use K=115 with Kmer<128> - uint64_t[4] implementation.
-> main 130 # throw, needs to increase KMER_LIST -> #define KMER_LIST 32, 64, 96, 128, 172 and #define KMER_N 5
+> main 530 # throw, needs to increase MAX_KMER_SIZE -> #define MAX_KMER_SIZE 544
 ```

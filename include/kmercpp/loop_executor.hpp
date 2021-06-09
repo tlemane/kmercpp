@@ -19,42 +19,35 @@
 #pragma once
 #include <cstddef>
 
-#ifndef KMER_LIST
-#define KMER_LIST 32, 64, 92, 128
-#endif
-
-#ifndef KMER_N
-#define KMER_N 4
-#endif
-
 namespace kmercpp {
 
-constexpr size_t kk[] = {KMER_LIST};
-
-template<size_t start, size_t stop>
+template<size_t MAX_K, size_t SIZE = 32>
 struct const_loop_executor
 {
   template<template<size_t> typename Functor, typename... Args>
-  static bool exec(size_t kmer_size, Args&&... args)
+  static void exec(size_t kmer_size, Args&&... args)
   {
-    if (kmer_size <= kk[start])
+    if (kmer_size < SIZE)
     {
-      Functor<kk[start]>()(std::forward<Args>(args)...);
-      return true;
+      Functor<SIZE>()(std::forward<Args>(args)...);
+      return;
     }
-    bool found = const_loop_executor<start + 1, stop>::template exec<Functor, Args...>(
+    const_loop_executor<MAX_K, SIZE + 32>::template exec<Functor, Args...>(
       kmer_size, std::forward<Args>(args)...);
-    if (!found)
-      throw std::runtime_error("No implementation found for this k-mer size.");
-    return true;
   }
 };
 
-template<size_t end>
-struct const_loop_executor<end, end>
+template<size_t SIZE>
+struct const_loop_executor<SIZE, SIZE>
 {
   template<template<size_t> typename Functor, typename... Args>
-  static bool exec(size_t kmer_size, Args&&... args) { return false; }
+  static void exec(size_t kmer_size, Args&&... args)
+  {
+    if (kmer_size < SIZE)
+      Functor<SIZE>()(std::forward<Args>(args)...);
+    else
+      throw std::runtime_error("No implementation found for this k-mer size.");
+  }
 };
 
 };

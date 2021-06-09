@@ -2,8 +2,7 @@
 #include <kmercpp/kmer.hpp>
 #include <kmercpp/kmer_hash.hpp>
 
-#define KMER_LIST 32, 64, 96, 128
-#define KMER_N 4
+#define MAX_KMER_SIZE 512
 
 #include <kmercpp/loop_executor.hpp>
 
@@ -24,6 +23,6 @@ int main(int argc, char* argv[])
   size_t ksize = std::stoll(kmer_size);
 
   // The first param ksize is for the selector, others are EntryPoint::operator() parameters.
-  kmercpp::const_loop_executor<0, KMER_N>::exec<EntryPoint>(ksize, ksize, argc, argv);
+  kmercpp::const_loop_executor<MAX_KMER_SIZE>::exec<EntryPoint>(ksize, ksize, argc, argv);
   return 0;
 }

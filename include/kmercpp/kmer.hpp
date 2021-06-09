@@ -506,7 +506,7 @@ public:
   *    Constructors      *
   ***********************/
 
-  Kmer() {}
+  Kmer() { zero(); }
   Kmer(size_t kmer_size) { set_k(kmer_size); }
   Kmer(const std::string& str_kmer) { set_polynom(str_kmer); }
 
@@ -576,8 +576,8 @@ public:
   Kmer<32> operator+(const Kmer<32>& o) const { Kmer<32> k; k.m_data = m_data + o.m_data; return k; }
   Kmer<32> operator+(uint64_t o) const { Kmer<32> k; k.m_data = m_data + o; return k; }
 
-  Kmer<32> operator-(const Kmer<32>& o) const { Kmer<32> k; k.m_data - o.m_data; return k; }
-  Kmer<32> operator-(uint64_t o) const { Kmer<32> k; k.m_data - o; return k; }
+  Kmer<32> operator-(const Kmer<32>& o) const { Kmer<32> k; k.m_data = m_data - o.m_data; return k; }
+  Kmer<32> operator-(uint64_t o) const { Kmer<32> k; k.m_data = m_data - o; return k; }
 
   Kmer<32> operator*(uint32_t coeff) const { Kmer<32> k; k.m_data = m_data * coeff; return k; }
   Kmer<32> operator/(uint32_t coeff) const { Kmer<32> k; k.m_data = m_data / coeff; return k; }
@@ -598,8 +598,8 @@ public:
 
 
   Kmer<32> operator~() const { Kmer<32> k; k.m_data = ~m_data; return k; }
-  Kmer<32> operator>>(uint32_t shift) const { Kmer<32> k(*this); k.m_data >> shift; return k; }
-  Kmer<32> operator<<(uint32_t shift) const { Kmer<32> k(*this); k.m_data << shift; return k; }
+  Kmer<32> operator>>(uint32_t shift) const { Kmer<32> k(*this); k.m_data = m_data >> shift; return k; }
+  Kmer<32> operator<<(uint32_t shift) const { Kmer<32> k(*this); k.m_data = m_data << shift; return k; }
 
   /***********************
   * Assignment operators *
@@ -620,8 +620,8 @@ public:
   Kmer<32>& operator|=(uint64_t o) { m_data |= o; return *this; }
   Kmer<32>& operator^=(uint64_t o) { m_data ^= o; return *this; }
 
-  Kmer<32>& operator>>=(uint32_t coeff) { m_data >>= coeff; return *this; }
-  Kmer<32>& operator<<=(uint32_t coeff) { m_data <<= coeff; return *this; }
+  Kmer<32>& operator>>=(uint32_t shift) { m_data >>= shift; return *this; }
+  Kmer<32>& operator<<=(uint32_t shift) { m_data <<= shift; return *this; }
 
   /***********************
   *   Kmer operations    *
@@ -822,8 +822,8 @@ public:
 
 
   Kmer<64> operator~() const { Kmer<64> k(*this); k.m_data = ~m_data; return k; }
-  Kmer<64> operator>>(uint32_t shift) const { Kmer<64> k(*this); k.m_data >> shift; return k; }
-  Kmer<64> operator<<(uint32_t shift) const { Kmer<64> k(*this); k.m_data << shift; return k; }
+  Kmer<64> operator>>(uint32_t shift) const { Kmer<64> k(*this); k.m_data = m_data >> shift; return k; }
+  Kmer<64> operator<<(uint32_t shift) const { Kmer<64> k(*this); k.m_data = m_data << shift; return k; }
 
   /***********************
   * Assignment operators *

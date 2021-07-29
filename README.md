@@ -1,4 +1,4 @@
-# kmercpp
+# kmercpp (WIP)
 
 A 2bit representation of a k-mer using c++17 with a runtime implementation selector mechanism.
 

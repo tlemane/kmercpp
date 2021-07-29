@@ -65,37 +65,6 @@ struct KmerHashers<0>
       return _hash;
     }
   };
-
-  template<size_t MAX_K>
-  struct WinHasher : public IKHasher<MAX_K>
-  {
-    WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-    static std::string name()
-    {
-      return "KmerHashers<0>::WinHasher<MAX_K=" + std::to_string(MAX_K) + ">";
-    }
-
-    uint64_t operator()(const Kmer<MAX_K>& kmer, uint64_t seed = 0) const final
-    {
-      uint64_t _hash = seed, _key = 0;
-      for (size_t i=0; i<kmer.m_n_data; i++)
-      {
-        _key = kmer.get_data64()[i];
-        _key = (~_key) + (_key << 21);
-        _key = _key ^ (_key >> 24);
-        _key = _key + (_key << 3) + (_key << 8);
-        _key = _key ^ (_key >> 14);
-        _key = _key + (_key << 2) + (_key << 4);
-        _key = _key ^ (_key >> 28);
-        _key = _key + (_key << 31);
-        _hash ^= _key;
-      }
-      return (_hash % w) + (w * p);
-    }
-  private:
-    uint64_t p {0};
-    uint64_t w {0};
-  };
 };
 
 template<>
@@ -155,74 +124,6 @@ struct KmerHashers<0>::Hasher<64> : public IKHasher<64>
   }
 };
 
-
-template<>
-struct KmerHashers<0>::WinHasher<32> : public IKHasher<32>
-{
-  WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-  static std::string name()
-  {
-    return "KmerHashers<0>::WinHasher<32>";
-  }
-
-  uint64_t operator()(const Kmer<32>& kmer, uint64_t seed = 0) const final
-  {
-    uint64_t _hash = seed, _key = kmer.get64();
-    _hash ^= (_hash << 7) ^ _key * (_hash >> 3) ^ (~((_hash << 11) + (_key ^ (_hash >> 5))));
-    _hash = (~_hash) + (_hash << 21);
-    _hash = _hash ^ (_hash >> 24);
-    _hash = (_hash + (_hash << 3)) + (_hash << 8);
-    _hash = _hash ^ (_hash >> 14);
-    _hash = (_hash + (_hash << 2)) + (_hash << 4);
-    _hash = _hash ^ (_hash >> 28);
-    _hash = _hash + (_hash << 31);
-    return (_hash % w) + (w * p);
-  }
-
-private:
-  uint64_t p {0};
-  uint64_t w {0};
-};
-
-template<>
-struct KmerHashers<0>::WinHasher<64> : public IKHasher<64>
-{
-  WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-  static std::string name()
-  {
-    return "KmerHashers<0>::WinHasher<64>";
-  }
-
-  uint64_t operator()(const Kmer<64>& kmer, uint64_t seed = 0) const final
-  {
-    uint64_t _hash = seed;
-    uint64_t _key = static_cast<uint64_t>(kmer.get128() >> 64);
-    _key = (~_key) + (_key << 21);
-    _key = _key ^ (_key >> 24);
-    _key = _key + (_key << 3) + (_key << 8);
-    _key = _key ^ (_key >> 14);
-    _key = _key + (_key << 2) + (_key << 4);
-    _key = _key ^ (_key >> 28);
-    _key = _key + (_key << 31);
-
-    _hash ^= _key;
-
-    _key = static_cast<uint64_t>(kmer.get128() & (((static_cast<__uint128_t>(1))<<64)-1));
-    _key = (~_key) + (_key << 21);
-    _key = _key ^ (_key >> 24);
-    _key = _key + (_key << 3) + (_key << 8);
-    _key = _key ^ (_key >> 14);
-    _key = _key + (_key << 2) + (_key << 4);
-    _key = _key ^ (_key >> 28);
-    _key = _key + (_key << 31);
-    return ((_hash ^ _key) % w) + (w * p);
-  }
-private:
-  uint64_t p {0};
-  uint64_t w {0};
-};
-
-
 #ifdef WITH_XXHASH
 template<>
 struct KmerHashers<1>
@@ -239,25 +140,6 @@ struct KmerHashers<1>
     {
       return XXH64(kmer.get_data64(), kmer.m_n_data, seed);
     }
-  };
-
-  template<size_t MAX_K>
-  struct WinHasher : public IKHasher<MAX_K>
-  {
-    WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-    static std::string name()
-    {
-      return "KmerHashers<1>::WinHasher<MAX_K=" + std::to_string(MAX_K) + ">";
-    }
-
-    uint64_t operator()(const Kmer<MAX_K>& kmer, uint64_t seed = 0) const final
-    {
-      return (XXH64(kmer.get_data64(), kmer.m_n_data, seed) % w) + (w * p);
-    }
-
-  private:
-    uint64_t p {0};
-    uint64_t w {0};
   };
 };
 
@@ -287,44 +169,6 @@ struct KmerHashers<1>::Hasher<64> : public IKHasher<64>
   {
     return XXH64(kmer.get_data64(), 16, seed);
   }
-};
-
-template<>
-struct KmerHashers<1>::WinHasher<32> : public IKHasher<32>
-{
-  WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-  static std::string name()
-  {
-    return "KmerHashers<1>::WinHasher<32>";
-  }
-
-  uint64_t operator()(const Kmer<32>& kmer, uint64_t seed = 0) const final
-  {
-    return (XXH64(kmer.get_data64(), 8, seed) % w) + (w * p);
-  }
-
-private:
-  uint64_t p {0};
-  uint64_t w {0};
-};
-
-template<>
-struct KmerHashers<1>::WinHasher<64> : public IKHasher<64>
-{
-  WinHasher(uint64_t p, uint64_t w) : p(p), w(w) {}
-  static std::string name()
-  {
-    return "KmerHashers<1>::WinHasher<64>";
-  }
-
-  uint64_t operator()(const Kmer<64>& kmer, uint64_t seed = 0) const final
-  {
-    return (XXH64(kmer.get_data64(), 16, seed) % w) + (w * p);
-  }
-
-private:
-  uint64_t p {0};
-  uint64_t w {0};
 };
 
 #endif

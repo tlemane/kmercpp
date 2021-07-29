@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 // Basically a 2bit representation of a k-mer, inspired by GATB-core.
-// see also kmer_hash.hpp
+// https://github.com/GATB/gatb-core
 
 #pragma once
 
@@ -28,8 +28,6 @@
 #include <cstdint>
 #include <sstream>
 #include <vector>
-
-#define DEFAULT_MINIMIZER_KM 1000000000
 
 namespace kmercpp
 {
@@ -72,7 +70,7 @@ const uint8_t rev_table[256] = {
  * and MAX_K=64 (__uint128_t).
  *
  *  @warning Multiple k-mer sizes should not be use at the same time in different k-mer object
- *  with the same specilization because kmer size is maintenaid as a static inline variable.
+ *  with the same specilization because kmer size is maintained as a static inline variable.
  *
  * @tparam MAX_K Maximum k-mer size
  */
@@ -138,14 +136,14 @@ protected:
       m_data[i] = data[i];
   }
 
-  void set_polynom(const char* data, size_t kmer_size)
+  void set_from_str(const char* data, size_t kmer_size)
   {
     set_k(kmer_size);
     for (size_t i=0; i<kmer_size; i++)
       (*this) = (*this) * 4 + NToB[data[i]];
   }
 
-  void set_polynom(const std::string& s)
+  void set_from_str(const std::string& s)
   {
     set_k(s.size());
     for (size_t i=0; i<s.size(); i++)
@@ -508,7 +506,7 @@ public:
 
   Kmer() { zero(); }
   Kmer(size_t kmer_size) { set_k(kmer_size); }
-  Kmer(const std::string& str_kmer) { set_polynom(str_kmer); }
+  Kmer(const std::string& str_kmer)  { set_from_str(str_kmer); }
 
   /***********************
   *    Set data          *
@@ -518,14 +516,14 @@ public:
   void set_k(size_t kmer_size) { m_data = 0; m_kmer_size = kmer_size; }
   void set64(uint64_t value) { m_data = value; }
 
-  void set_polynom(const char* data, size_t kmer_size)
+  void set_from_str(const char* data, size_t kmer_size)
   {
     set_k(kmer_size);
     for (size_t i=0; i<kmer_size; i++)
       m_data = m_data * 4 + NToB[data[i]];
   }
 
-  void set_polynom(const std::string& s)
+  void set_from_str(const std::string& s)
   {
     set_k(s.size());
     for (size_t i=0; i<s.size(); i++)
@@ -726,7 +724,7 @@ public:
 
   Kmer() {}
   Kmer(size_t kmer_size) { set_k(kmer_size); }
-  Kmer(const std::string& str_kmer) { set_polynom(str_kmer); }
+  Kmer(const std::string& str_kmer) { set_from_str(str_kmer); }
 
   /***********************
   *    Set data          *
@@ -737,14 +735,14 @@ public:
   void set64(uint64_t value) { m_data = value; }
   void set128(__uint128_t value) { m_data = value; }
 
-  void set_polynom(const char* data, size_t kmer_size)
+  void set_from_str(const char* data, size_t kmer_size)
   {
     set_k(kmer_size);
     for (size_t i=0; i<kmer_size; i++)
       m_data = m_data * 4 + NToB[data[i]];
   }
 
-  void set_polynom(const std::string& s)
+  void set_from_str(const std::string& s)
   {
     set_k(s.size());
     for (size_t i=0; i<s.size(); i++)

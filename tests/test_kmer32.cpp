@@ -1,3 +1,4 @@
+#include <fstream>
 #include <gtest/gtest.h>
 #define protected public
 #include <kmercpp/kmer.hpp>
@@ -33,8 +34,8 @@ TEST(kmer32, kmer_set_str)
     {
       std::string kmer_str = random_dna_seq(s);
       Kmer<32> kmer(kmer_str);
-      Kmer<32> kmer2; kmer2.set_polynom(kmer_str);
-      Kmer<32> kmer3; kmer3.set_polynom(kmer_str.c_str(), kmer_str.size());
+      Kmer<32> kmer2; kmer2.set_from_str(kmer_str);
+      Kmer<32> kmer3; kmer3.set_from_str(kmer_str.c_str(), kmer_str.size());
       EXPECT_EQ(kmer_str, kmer.to_string());
       EXPECT_EQ(kmer_str, kmer2.to_string());
       EXPECT_EQ(kmer_str, kmer3.to_string());
@@ -57,15 +58,40 @@ TEST(kmer32, kmer_get_data)
   EXPECT_EQ(kmer.get_data8()[7], 0x00);
 }
 
-
 TEST(kmer32, kmer_access_data)
 {
-
+  for (size_t s=1; s<32; s++)
+  {
+    for (size_t i=0; i<1000; i++)
+    {
+      std::string kmer_str = random_dna_seq(s);
+      std::string reverse; reverse.resize(s);
+      std::reverse_copy(kmer_str.begin(), kmer_str.end(), reverse.begin());
+      Kmer<32> kmer(kmer_str);
+      for (size_t j=0; j<s; j++)
+      {
+        EXPECT_EQ(kmer.at(j), kmer_str.at(j));
+        EXPECT_EQ(kmer.at2bit(j), NToB[kmer_str.at(j)]);
+        EXPECT_EQ(kmer[j], NToB[reverse.at(j)]);
+      }
+    }
+  }
 }
 
 TEST(kmer32, kmer_comparison_operators)
 {
-
+  for (size_t s=1; s<32; s++)
+  {
+    for (size_t i=0; i<1000; i++)
+    {
+      std::string kmer_str = random_dna_seq(s);
+      Kmer<32> kmer(kmer_str);
+      Kmer<32> kmer2(kmer_str);
+      EXPECT_EQ(kmer.to_string(), kmer_str);
+      EXPECT_EQ(kmer2.to_string(), kmer_str);
+      EXPECT_EQ(kmer, kmer2);
+    }
+  }
 }
 
 TEST(kmer32, kmer_arithmetic_operators)
@@ -90,13 +116,44 @@ TEST(kmer32, kmer_operations)
 
 TEST(kmer32, kmer_str_representation)
 {
-
+  for (size_t s=1; s<32; s++)
+  {
+    for (size_t i=0; i<1000; i++)
+    {
+      std::string kmer_str = random_dna_seq(s);
+      Kmer<32> kmer(kmer_str);
+      EXPECT_EQ(kmer.to_string(), kmer_str);
+    }
+  }
 }
 
 TEST(kmer32, kmer_stream)
 {
-
+  std::vector<std::string> svec;
+  {
+    std::ofstream out("./stream_test.kmer32", std::ios::out | std::ios::binary);
+    for (size_t s=1; s<32; s++)
+    {
+      for (size_t i=0; i<1000; i++)
+      {
+        std::string kmer_str = random_dna_seq(s);
+        svec.push_back(kmer_str);
+        Kmer<32> kmer(kmer_str);
+        kmer.dump(out);
+      }
+    }
+  }
+  {
+    std::ifstream in("./stream_test.kmer32", std::ios::in | std::ios::binary);
+    size_t j = 0;
+    for (size_t s=1; s<32; s++)
+    {
+      for (size_t i=0; i<1000; i++)
+      {
+        Kmer<32> kmer(s);
+        kmer.load(in);
+        EXPECT_EQ(kmer.to_string(), svec[j]); j++;
+      }
+    }
+  }
 }
-
-
-

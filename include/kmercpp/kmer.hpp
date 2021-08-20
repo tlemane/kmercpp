@@ -110,7 +110,7 @@ protected:
 
   Kmer() { zero(); }
   Kmer(size_t kmer_size) { set_k(kmer_size); }
-  Kmer(const std::string& str_kmer) { set_polynom(str_kmer); }
+  Kmer(const std::string& str_kmer) { set_from_str(str_kmer); }
 
   /***********************
   *    Set data          *
